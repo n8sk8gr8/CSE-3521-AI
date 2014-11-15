@@ -28,7 +28,6 @@ void Board::readFile(string filename)
             {
                 for (int i = 0; i < line.length(); i++)
                 {
-                    cout << line[i] << endl;  // Don't need this later
                     initial_state.push_back(string(1, line[i]));
                 }
                 first_line = false;
@@ -51,16 +50,14 @@ int main(int argc, char ** argv)
     Board* board = new Board();
     board->readFile(filename);
     board->createStateVector();
-    cout << board->empty_spots << endl;
+    cout << "Number of unknown spots " << board->unknown_spots << endl;
     
-    for (int i = 0; i < board->initial_state.size(); i++)
-    {
-        cout << board->initial_state[i] << endl;
-    }
     
     board->initalizeSudokuBoard();
     board->setupHillClimber();
     board->printSudokuBoard();
+    cout << endl;
+    board->generateSuccessor();
     
 	return 0;
 }

@@ -13,12 +13,17 @@
 class Board
 {
 public:
-    int empty_spots = 0;
-    //std::vector<std::string> state_vector;
+    int unknown_spots = 0;
+    int number_conflicts = 0;
+
     std::vector<int> state_vector;
 	std::vector<std::string> initial_state;
 	std::vector<int> sudoko_board;
+    std::vector<int> successor;
+    
     Board(){};
+    ~Board();
+    
     void readFile(std::string filename);
     void createStateVector()
     {
@@ -27,11 +32,9 @@ public:
         {
             if (initial_state[i].compare("*") == 0)
             {
-                //initial_state[i] = std::string(1, char(character + empty_spots));
                 initial_state[i] = std::string("0");
-                //state_vector.push_back(std::string(1, char(character + empty_spots)));
                 state_vector.push_back(i);
-                empty_spots++;
+                unknown_spots++;
             }
         }
     }
@@ -39,6 +42,11 @@ public:
     void initalizeSudokuBoard();
     void setupHillClimber();
     void printSudokuBoard();
+    void printSuccessorBoard();
+    void generateSuccessor();
+    void evaluate();
+    void checkHorizontalConflicts();
+
 
 };
 

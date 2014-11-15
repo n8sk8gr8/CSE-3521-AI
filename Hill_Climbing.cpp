@@ -36,6 +36,7 @@ void Board::setupHillClimber()
         {
             sudoko_board[i] = randomInt();
         }
+        successor.push_back(sudoko_board[i]);
     }
 }
 
@@ -49,4 +50,56 @@ void Board::printSudokuBoard()
         }
         cout << endl;
     }
+}
+
+void Board::printSuccessorBoard()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            cout << successor[i * 4 + j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+/* Generate all possible successors */
+void Board::generateSuccessor()
+{
+    for (int i = 0; i < state_vector.size(); i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            successor[state_vector[i]] = j + 1;
+            this->evaluate();
+        }
+    }
+}
+
+void Board::checkHorizontalConflicts()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        int row_conflicts = 0;
+        for (int j = 0; j < 4; j++)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                
+                row_conflicts += (successor[i * 4 + j] == successor[i * 4 + k] && (i * 4 + j) != (i * 4 + k)) ? 1 : 0;
+            }
+        }
+        number_conflicts += row_conflicts;
+    }
+}
+
+
+void Board::evaluate()
+{
+    this->checkHorizontalConflicts();
+    cout << "Number of conflicts " << number_conflicts << endl;
+    this->printSuccessorBoard();
+    cout << endl;
+    number_conflicts = 0;
 }
