@@ -95,6 +95,56 @@ void Board::checkHorizontalConflicts()
 }
 
 
+/* Counts all of the vertical conflicts in the current successor board */
+void Board::checkVerticalConflicts()
+{
+    for (int i = 0; i < 4; i++)
+    {
+        int col_conflicts = 0;
+        for (int j = 0; j < 4; j++)
+        {
+            for (int k = 0; k < 4; k++)
+            {
+                col_conflicts += (successor[j * 4 + i] == successor[k * 4 + i] && (j * 4 + i) != (k * 4 + i)) ? 1 : 0;
+            }
+        }
+        number_conflicts += col_conflicts;
+    }
+}
+
+/* Returns the number of duplicates */
+int Board::duplicates(vector<int> box)
+{
+    int num_duplicates = 0;
+    for (int i = 0; i < box.size(); i++)
+    {
+        for (int j = 0; j < box.size(); j++)
+        {
+            num_duplicates += (box[i] == box[j] && i != j) ? 1 : 0;
+        }
+    }
+    return num_duplicates;
+}
+
+/* Counts all of the conflicts in the boxes for a given successor */
+void Board::checkBoxConflicts()
+{
+    int box_conflicts = 0;
+
+    box_conflicts += this->duplicates(box_top_left);
+    box_conflicts += this->duplicates(box_top_right);
+    box_conflicts += this->duplicates(box_bottom_right);
+    box_conflicts += this->duplicates(box_bottom_left);
+    
+    number_conflicts += box_conflicts;
+    
+    box_bottom_left.clear();
+    box_bottom_right.clear();
+    box_top_left.clear();
+    box_top_right.clear();
+}
+
+
 void Board::evaluate()
 {
     this->checkHorizontalConflicts();

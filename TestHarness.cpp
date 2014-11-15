@@ -59,5 +59,17 @@ int main(int argc, char ** argv)
     cout << endl;
     board->generateSuccessor();
     
+    cout << "BEST BOARD " << endl;
+    //board->printBoard(board->best_successor);
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            cout << board->best_successor[i * 4 + j] << " ";
+        }
+        cout << endl;
+    }
+    cout << board->number_conflicts_best_successor << endl;
+    
 	return 0;
 }
