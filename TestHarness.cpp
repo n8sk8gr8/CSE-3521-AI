@@ -57,5 +57,10 @@ int main(int argc, char ** argv)
     {
         cout << board->initial_state[i] << endl;
     }
+    
+    board->initalizeSudokuBoard();
+    board->setupHillClimber();
+    board->printSudokuBoard();
+    
 	return 0;
 }
