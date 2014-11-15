@@ -24,9 +24,10 @@ void Board::initalizeSudokuBoard()
 int randomInt()
 {
     srand(time(NULL));
-    sleep(1);
+    //sleep(1);
     return ((rand() % 4) + 1);
 }
+
 
 void Board::setupHillClimber()
 {
@@ -52,13 +53,25 @@ void Board::printSudokuBoard()
     }
 }
 
-void Board::printSuccessorBoard()
+void Board::printBoard(vector<int> &current_board)
 {
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)
         {
-            cout << successor[i * 4 + j] << " ";
+            cout << current_board[i * 4 + j] << " ";
+        }
+        cout << endl;
+    }
+}
+
+void Board::printSuccessorBox(vector<int> box)
+{
+    for (int i = 0; i < 2; i++)
+    {
+        for (int j = 0; j < 2; j++)
+        {
+            cout << box[i * 2 + j] << " ";
         }
         cout << endl;
     }
@@ -77,6 +90,7 @@ void Board::generateSuccessor()
     }
 }
 
+/* Counts all of the horizontal conflicts in the current successor board */
 void Board::checkHorizontalConflicts()
 {
     for (int i = 0; i < 4; i++)
@@ -147,9 +161,44 @@ void Board::checkBoxConflicts()
 
 void Board::evaluate()
 {
+    this->setupSudokuBoxes();
+    this->printSuccessorBox(box_top_left);
+    
+    /* Calculate all of the conflicts of the current successor */
     this->checkHorizontalConflicts();
+    this->checkVerticalConflicts();
+    this->checkBoxConflicts();
+    
     cout << "Number of conflicts " << number_conflicts << endl;
-    this->printSuccessorBoard();
+    this->printBoard(successor);
+    
+    if (number_conflicts < number_conflicts_best_successor)
+    {
+        cout << "Setting new Best successor " << endl;
+        this->setBestSuccessor();
+    }
+    
     cout << endl;
     number_conflicts = 0;
+}
+
+
+void Board::setBestSuccessor()
+{
+    best_successor.clear();
+    number_conflicts_best_successor = number_conflicts;
+    cout << successor.size() << endl;
+    for (int i = 0; i < successor.size(); i++)
+    {
+        best_successor.push_back(successor[i]);
+    }
+    cout << "NEW BEST BOARD    " << endl;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            cout << best_successor[i * 4 + j] << " ";
+        }
+        cout << endl;
+    }
 }
