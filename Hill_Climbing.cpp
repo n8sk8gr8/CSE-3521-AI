@@ -24,8 +24,6 @@ void Board::initalizeSudokuBoard()
 
 int randomInt()
 {
-    srand(time(NULL));
-    //sleep(1);
     return ((rand() % 4) + 1);
 }
 
@@ -224,18 +222,6 @@ void Board::evaluate()
         cout << "Setting new Best successor " << endl;
         this->setBestSuccessor();
     }
-    
-    if (number_conflicts == number_conflicts_best_successor)
-    {
-        if (randomInt() > 2)
-        {
-  
-            cout << "Setting new Best successor " << endl;
-            this->setBestSuccessor();
-        }
-    }
-    
-    
     
     cout << endl;
     number_conflicts = 0;
