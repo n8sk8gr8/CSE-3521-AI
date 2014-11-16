@@ -46,7 +46,12 @@ void Board::readFile(string filename)
 
 int main(int argc, char ** argv)
 {
-	string filename("sudoku_data.txt");
+    if (argc != 2)
+    {
+        cout << "Usage: " << argv[0] << " <Sudoku_board> " << endl;
+        exit(2);
+    }
+	string filename(argv[1]);
     Board* board = new Board();
     board->readFile(filename);
     board->createStateVector();

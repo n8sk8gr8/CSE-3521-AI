@@ -184,10 +184,9 @@ void Board::hillClimber()
         }
         
         /* Set Best successor found to successor */
-        successor.clear();
-        for (int i = 0; i <= best_successor.size(); i++)
+        for (int i = 0; i < best_successor.size(); i++)
         {
-            successor.push_back(best_successor[i]);
+            successor[i] = (best_successor[i]);
         }
     }
 }
@@ -220,11 +219,23 @@ void Board::evaluate()
     cout << "Number of conflicts " << number_conflicts << endl;
     this->printBoard(successor);
     
-    if (number_conflicts <= number_conflicts_best_successor)
+    if (number_conflicts < number_conflicts_best_successor)
     {
         cout << "Setting new Best successor " << endl;
         this->setBestSuccessor();
     }
+    
+    if (number_conflicts == number_conflicts_best_successor)
+    {
+        if (randomInt() > 2)
+        {
+  
+            cout << "Setting new Best successor " << endl;
+            this->setBestSuccessor();
+        }
+    }
+    
+    
     
     cout << endl;
     number_conflicts = 0;
