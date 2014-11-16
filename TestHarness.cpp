@@ -51,18 +51,11 @@ int main(int argc, char ** argv)
     board->readFile(filename);
     board->createStateVector();
     cout << "Number of unknown spots " << board->unknown_spots << endl;
-    
-    
-    //board->initalizeSudokuBoard();
-//    board->setupHillClimber();
-//    board->printSudokuBoard();
-    cout << endl;
-    //board->generateSuccessor();
-    //board->hillClimber();
+
     board->randomRestart();
     
     cout << "BEST BOARD " << endl;
-    //board->printBoard(board->best_successor);
+
     for (int i = 0; i < 4; i++)
     {
         for (int j = 0; j < 4; j++)

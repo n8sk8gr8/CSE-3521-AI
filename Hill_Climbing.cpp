@@ -85,8 +85,10 @@ void Board::generateSuccessor()
     {
         for (int j = 0; j < 4; j++)
         {
+            int value = successor[state_vector[i]];
             successor[state_vector[i]] = j + 1;
             this->evaluate();
+            successor[state_vector[i]] = value;
         }
     }
 }
@@ -163,7 +165,7 @@ void Board::checkBoxConflicts()
 void Board::hillClimber()
 {
     int number_conflicts_best_previous_successor = 145;
-    while (number_conflicts_best_successor != number_conflicts_best_previous_successor)
+    while (number_conflicts_best_successor != number_conflicts_best_previous_successor && !solved)
     {
         number_conflicts_best_previous_successor = number_conflicts_best_successor;
         
@@ -174,13 +176,16 @@ void Board::hillClimber()
         
         cout << "number_conflicts_best_previous_successor = " << number_conflicts_best_previous_successor << endl;
 
+        /* Check if the Sudoku puzzle is solved */
         if (number_conflicts_best_successor == 0)
         {
             cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
+            solved = true;
         }
         
+        /* Set Best successor found to successor */
         successor.clear();
-        for (int i = 0; i < best_successor.size(); i++)
+        for (int i = 0; i <= best_successor.size(); i++)
         {
             successor.push_back(best_successor[i]);
         }
@@ -189,13 +194,17 @@ void Board::hillClimber()
 
 void Board::randomRestart()
 {
-    int timeout = 1000;
-    for (int i = 0; i < timeout; i++)
+    int i = 0;
+    while (!solved)
     {
+        number_conflicts_best_successor = 144;
         initalizeSudokuBoard();
         setupHillClimber();
+        printSudokuBoard();
         hillClimber();
         cout << "TIMEOUT COUNT " << i << endl;
+        i++;
+        successor.clear();
     }
 }
 
@@ -216,7 +225,7 @@ void Board::evaluate()
         cout << "Setting new Best successor " << endl;
         this->setBestSuccessor();
     }
-        
+    
     cout << endl;
     number_conflicts = 0;
 }
