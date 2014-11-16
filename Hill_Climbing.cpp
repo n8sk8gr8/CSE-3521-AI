@@ -15,6 +15,7 @@ using namespace std;
 
 void Board::initalizeSudokuBoard()
 {
+    sudoko_board.clear();
     for (int i = 0; i < initial_state.size(); i++)
     {
         sudoko_board.push_back(stoi(initial_state[i]));
@@ -159,10 +160,48 @@ void Board::checkBoxConflicts()
 }
 
 
+void Board::hillClimber()
+{
+    int number_conflicts_best_previous_successor = 145;
+    while (number_conflicts_best_successor != number_conflicts_best_previous_successor)
+    {
+        number_conflicts_best_previous_successor = number_conflicts_best_successor;
+        
+        /* Find next successor */
+        generateSuccessor();
+        
+        cout << "number_conflicts_best_successor = " << number_conflicts_best_successor << endl;
+        
+        cout << "number_conflicts_best_previous_successor = " << number_conflicts_best_previous_successor << endl;
+
+        if (number_conflicts_best_successor == 0)
+        {
+            cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
+        }
+        
+        successor.clear();
+        for (int i = 0; i < best_successor.size(); i++)
+        {
+            successor.push_back(best_successor[i]);
+        }
+    }
+}
+
+void Board::randomRestart()
+{
+    int timeout = 1000;
+    for (int i = 0; i < timeout; i++)
+    {
+        initalizeSudokuBoard();
+        setupHillClimber();
+        hillClimber();
+        cout << "TIMEOUT COUNT " << i << endl;
+    }
+}
+
 void Board::evaluate()
 {
     this->setupSudokuBoxes();
-    this->printSuccessorBox(box_top_left);
     
     /* Calculate all of the conflicts of the current successor */
     this->checkHorizontalConflicts();
@@ -172,12 +211,12 @@ void Board::evaluate()
     cout << "Number of conflicts " << number_conflicts << endl;
     this->printBoard(successor);
     
-    if (number_conflicts < number_conflicts_best_successor)
+    if (number_conflicts <= number_conflicts_best_successor)
     {
         cout << "Setting new Best successor " << endl;
         this->setBestSuccessor();
     }
-    
+        
     cout << endl;
     number_conflicts = 0;
 }
@@ -188,17 +227,9 @@ void Board::setBestSuccessor()
     best_successor.clear();
     number_conflicts_best_successor = number_conflicts;
     cout << successor.size() << endl;
+    
     for (int i = 0; i < successor.size(); i++)
     {
         best_successor.push_back(successor[i]);
-    }
-    cout << "NEW BEST BOARD    " << endl;
-    for (int i = 0; i < 4; i++)
-    {
-        for (int j = 0; j < 4; j++)
-        {
-            cout << best_successor[i * 4 + j] << " ";
-        }
-        cout << endl;
     }
 }

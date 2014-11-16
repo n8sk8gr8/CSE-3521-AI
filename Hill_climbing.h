@@ -15,6 +15,7 @@ class Board
 public:
     int unknown_spots = 0;
     int number_conflicts_best_successor = 144; // 144 Max number of conflicts
+    //int number_conflicts_best_previous_successor = 145;
     int number_conflicts = 0;
 
     std::vector<int> state_vector;
@@ -72,6 +73,8 @@ public:
     void checkBoxConflicts();
     int duplicates(std::vector<int> box);
     void setBestSuccessor();
+    void hillClimber();
+    void randomRestart();
 
 
 };

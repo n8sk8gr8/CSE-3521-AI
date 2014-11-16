@@ -53,11 +53,13 @@ int main(int argc, char ** argv)
     cout << "Number of unknown spots " << board->unknown_spots << endl;
     
     
-    board->initalizeSudokuBoard();
-    board->setupHillClimber();
-    board->printSudokuBoard();
+    //board->initalizeSudokuBoard();
+//    board->setupHillClimber();
+//    board->printSudokuBoard();
     cout << endl;
-    board->generateSuccessor();
+    //board->generateSuccessor();
+    //board->hillClimber();
+    board->randomRestart();
     
     cout << "BEST BOARD " << endl;
     //board->printBoard(board->best_successor);
