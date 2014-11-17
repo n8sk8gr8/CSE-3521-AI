@@ -77,6 +77,7 @@ public:
     void checkBoxConflicts();
     int duplicates(std::vector<int> box);
     void hillClimber();
+    bool unknown_spot(int);
 };
 
 

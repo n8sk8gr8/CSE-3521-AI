@@ -18,7 +18,7 @@ double Board::population_fitness = 0.0;
 
 Population::Population(std::string filename)
 {
-    pop.resize(50);
+    pop.resize(20);
     cout << pop.size() << endl;
     file_name = filename;
 }
@@ -35,7 +35,6 @@ void Population::setupPopulation()
 
 void Board::initalizeSudokuBoard()
 {
-    //sudoko_board.clear();
     for (int i = 0; i < initial_state.size(); i++)
     {
         sudoko_board.push_back(stoi(initial_state[i]));
@@ -212,8 +211,11 @@ void Population::crossover()
 {
     for (int i = 0; i < pop.size() / 2; i++)
     {
-        Board* individual1 = pop[i];
-        Board* individual2 = pop[i + 1];
+        /* Randomly choose mates after weighted average calculated */
+        int mate1 = rand() % pop[i]->sudoko_board.size();
+        int mate2 = rand() % pop[i]->sudoko_board.size();
+        Board* individual1 = pop[mate1];
+        Board* individual2 = pop[mate2];
         
         int head_or_tails = rand() % 2;
         int split = rand() % individual1->sudoko_board.size();
@@ -252,6 +254,12 @@ void Population::crossover()
 }
 
 
+bool Board::unknown_spot(int spot)
+{
+    return (initial_state[spot].compare("0") == 0);
+}
+
+
 void Population::mutation()
 {
     for (int i = 0; i < pop.size(); i++)
@@ -259,7 +267,7 @@ void Population::mutation()
         int mutate = rand() % 10;
         int mutate_position = rand() % pop[i]->successor.size();
         
-        if (mutate == 0)
+        if (mutate == 0 && pop[i]->unknown_spot(mutate_position))
         {
             pop[i]->successor[mutate_position] = randomInt();
         }
@@ -284,14 +292,12 @@ void Population::geneticAlgorithm()
 {
     for (int i = 0; i < pop.size(); i++)
     {
-        
-        //number_conflicts_best_successor = 144;
         pop[i]->initalizeSudokuBoard();
         pop[i]->setupInitialPopulation();
         cout << "Initalized individual " << i << endl;
     }
     
-    for (int i = 0; i < 30; i++)
+    for (int i = 0; i < 50; i++)
     {
 
         cout << "POP SIZE " << pop.size() << endl;
