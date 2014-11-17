@@ -95,6 +95,8 @@ public:
     void crossoverProbability();
     void selectCrossoverIndividuals();
     void crossover();
+    void mutation();
+    void setupNewPopulationToOldPopulation();
 };
 
 

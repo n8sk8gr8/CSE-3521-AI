@@ -18,7 +18,7 @@ double Board::population_fitness = 0.0;
 
 Population::Population(std::string filename)
 {
-    pop.resize(100);
+    pop.resize(50);
     cout << pop.size() << endl;
     file_name = filename;
 }
@@ -182,11 +182,12 @@ void Population::crossoverProbability()
 {
     for (int i = 0; i < pop.size(); i++)
     {
+        double crossover_factor = 1000;
         pop[i]->crossover_prob = pop[i]->fitness_value / Board::population_fitness;
         
-        cout << "Individual " << i << "  " << pop[i]->crossover_prob * 1000.0 << endl;
+        cout << "Individual " << i << "  " << pop[i]->crossover_prob * crossover_factor << endl;
         
-        for (int j = 0; j < round(pop[i]->crossover_prob * 1000.0); j++)
+        for (int j = 0; j < round(pop[i]->crossover_prob * crossover_factor); j++)
         {
             crossover_population.push_back(i);
         }
@@ -251,6 +252,34 @@ void Population::crossover()
 }
 
 
+void Population::mutation()
+{
+    for (int i = 0; i < pop.size(); i++)
+    {
+        int mutate = rand() % 10;
+        int mutate_position = rand() % pop[i]->successor.size();
+        
+        if (mutate == 0)
+        {
+            pop[i]->successor[mutate_position] = randomInt();
+        }
+    }
+}
+
+
+void Population::setupNewPopulationToOldPopulation()
+{
+    for (int i = 0; i < pop.size(); i++)
+    {
+        for (int j = 0; j < pop[i]->sudoko_board.size(); j++)
+        {
+            pop[i]->sudoko_board[j] = pop[i]->successor[j];
+        }
+        
+    }
+
+}
+
 void Population::geneticAlgorithm()
 {
     for (int i = 0; i < pop.size(); i++)
@@ -262,7 +291,7 @@ void Population::geneticAlgorithm()
         cout << "Initalized individual " << i << endl;
     }
     
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < 30; i++)
     {
 
         cout << "POP SIZE " << pop.size() << endl;
@@ -276,6 +305,8 @@ void Population::geneticAlgorithm()
         selectCrossoverIndividuals();
         cout << "\nCrossover occurs " << endl;
         crossover();
+        mutation();
+        setupNewPopulationToOldPopulation();
         Board::population_fitness = 0.0;
     }
 }
