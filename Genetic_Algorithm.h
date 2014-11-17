@@ -14,7 +14,12 @@ class Board
 {
 public:
     int unknown_spots = 0;
+    const int MAXCONFLICTS = 144;
     int number_conflicts_best_successor = 144; // 144 Max number of conflicts
+    int fitness_value = 0;
+    static double population_fitness;
+    double crossover_prob = 0;
+    
     int number_conflicts = 0;
     bool solved = false;
 
@@ -82,12 +87,14 @@ class Population
 public:
     std::string file_name;
     std::vector<Board*> pop;
+    std::vector<int> crossover_population;
     Population(std::string);
 
     ~Population(){};
     
     void setupPopulation();
     void geneticAlgorithm();
+    void crossoverProbability();
 };
 
 
