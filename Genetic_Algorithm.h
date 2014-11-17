@@ -98,6 +98,7 @@ public:
     void crossover();
     void mutation();
     void setupNewPopulationToOldPopulation();
+    bool checkSolved();
 };
 
 

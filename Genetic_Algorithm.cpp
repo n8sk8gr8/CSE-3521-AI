@@ -18,7 +18,7 @@ double Board::population_fitness = 0.0;
 
 Population::Population(std::string filename)
 {
-    pop.resize(20);
+    pop.resize(100);
     cout << pop.size() << endl;
     file_name = filename;
 }
@@ -171,12 +171,26 @@ void Board::hillClimber()
     evaluate();
 
     /* Check if the Sudoku puzzle is solved */
-    if (fitness_value == 144)
+    if (fitness_value > 136)
     {
-        cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
+        //cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
         solved = true;
     }
 }
+
+bool Population::checkSolved()
+{
+    for (int i = 0; i < pop.size(); i++)
+    {
+        if(pop[i]->solved)
+        {
+            return true;
+        }
+        
+    }
+    return false;
+}
+
 void Population::crossoverProbability()
 {
     for (int i = 0; i < pop.size(); i++)
@@ -204,35 +218,43 @@ void Population::selectCrossoverIndividuals()
         cout << "Individual " << i << " is  now " << crossover_population[individual] << endl;
         pop[i]->printSudokuBoard();
     }
+    crossover_population.clear();
+
 }
 
 
 void Population::crossover()
 {
-    for (int i = 0; i < pop.size() / 2; i++)
+    for (int i = 0; i < pop.size() / 2; i+=2)
     {
         /* Randomly choose mates after weighted average calculated */
-        int mate1 = rand() % pop[i]->sudoko_board.size();
-        int mate2 = rand() % pop[i]->sudoko_board.size();
+        int mate1 = rand() % pop.size();
+        int mate2 = rand() % pop.size();
         Board* individual1 = pop[mate1];
         Board* individual2 = pop[mate2];
         
         int head_or_tails = rand() % 2;
-        int split = rand() % individual1->sudoko_board.size();
+        int split = rand() % individual1->successor.size();
         
         /* Cross head of individual1 and tail of individual2 */
         if (head_or_tails == 0)
         {
             for (int j = 0; j < split; j++)
             {
-                pop[i]->successor[j] = individual1->sudoko_board[j];
-                pop[i + 1]->successor[j] = individual2->sudoko_board[j];
+                if (pop[i]->unknown_spot(j))
+                {
+                    pop[i]->successor[j] = individual1->successor[j];
+                    pop[i + 1]->successor[j] = individual2->successor[j];
+                }
             }
             
-            for (int j = split; j < individual1->sudoko_board.size(); j++)
+            for (int j = split; j < individual1->successor.size(); j++)
             {
-                pop[i]->successor[j] = individual2->sudoko_board[j];
-                pop[i + 1]->successor[j] = individual1->sudoko_board[j];
+                if (pop[i]->unknown_spot(j))
+                {
+                    pop[i]->successor[j] = individual2->successor[j];
+                    pop[i + 1]->successor[j] = individual1->successor[j];
+                }
             }
         }
         /* Cross head of individual2 and tail of individual1 */
@@ -240,14 +262,20 @@ void Population::crossover()
         {
             for (int j = 0; j < split; j++)
             {
-                pop[i]->successor[j] = individual2->sudoko_board[j];
-                pop[i + 1]->successor[j] = individual1->sudoko_board[j];
+                if (pop[i]->unknown_spot(j))
+                {
+                    pop[i]->successor[j] = individual2->successor[j];
+                    pop[i + 1]->successor[j] = individual1->successor[j];
+                }
             }
             
-            for (int j = split; j < individual1->sudoko_board.size(); j++)
+            for (int j = split; j < individual1->successor.size(); j++)
             {
-                pop[i]->successor[j] = individual1->sudoko_board[j];
-                pop[i + 1]->successor[j] = individual2->sudoko_board[j];
+                if (pop[i]->unknown_spot(j))
+                {
+                    pop[i]->successor[j] = individual1->successor[j];
+                    pop[i + 1]->successor[j] = individual2->successor[j];
+                }
             }
         }
     }
@@ -262,14 +290,17 @@ bool Board::unknown_spot(int spot)
 
 void Population::mutation()
 {
-    for (int i = 0; i < pop.size(); i++)
+    for (int i = 0; i < pop.size() / 2; i+=2)
     {
         int mutate = rand() % 10;
         int mutate_position = rand() % pop[i]->successor.size();
-        
+        int spot;
         if (mutate == 0 && pop[i]->unknown_spot(mutate_position))
         {
-            pop[i]->successor[mutate_position] = randomInt();
+            spot = pop[i]->successor[mutate_position];
+            
+            pop[i]->successor[mutate_position] = pop[i + 1]->successor[mutate_position];
+            pop[i + 1]->successor[mutate_position] = spot;
         }
     }
 }
@@ -297,23 +328,30 @@ void Population::geneticAlgorithm()
         cout << "Initalized individual " << i << endl;
     }
     
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 20; i++)
     {
-
-        cout << "POP SIZE " << pop.size() << endl;
-        for (int j = 0; j < pop.size(); j++)
+        if(!checkSolved())
         {
-            pop[j]->printSudokuBoard();
-            pop[j]->hillClimber();
+            cout << "POP SIZE " << pop.size() << endl;
+            for (int j = 0; j < pop.size(); j++)
+            {
+                pop[j]->printSudokuBoard();
+                pop[j]->hillClimber();
+            }
+            crossoverProbability();
+            cout << "Population fitness " << Board::population_fitness << endl;
+            selectCrossoverIndividuals();
+            cout << "\nCrossover occurs " << endl;
+            crossover();
+            mutation();
+            //setupNewPopulationToOldPopulation();
+            Board::population_fitness = 0.0;
         }
-        crossoverProbability();
-        cout << "Population fitness " << Board::population_fitness << endl;
-        selectCrossoverIndividuals();
-        cout << "\nCrossover occurs " << endl;
-        crossover();
-        mutation();
-        setupNewPopulationToOldPopulation();
-        Board::population_fitness = 0.0;
+        else
+        {
+            cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
+            return;
+        }
     }
 }
 
