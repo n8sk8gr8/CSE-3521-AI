@@ -51,30 +51,22 @@ int main(int argc, char ** argv)
         cout << "Usage: " << argv[0] << " <Sudoku_board> " << endl;
         exit(2);
     }
+    
 	string filename(argv[1]);
-    //Board* board = new Board();
-    //board->readFile(filename);
-    //board->createStateVector();
+
     Population* population = new Population(filename);
     population->setupPopulation();
-    
     population->geneticAlgorithm();
-    cout << population->pop.size() << endl;
-    //cout << "Number of unknown spots " << board->unknown_spots << endl;
-
-    //board->geneticAlgorithm();
     
-    cout << "BEST BOARD " << endl;
+    cout << "Sudoku Puzzle Solved " << endl;
+    for (int i = 0; i < 4; i++)
+    {
+        for (int j = 0; j < 4; j++)
+        {
+            cout << population->solution_board[i * 4 + j] << " ";
+        }
+        cout << endl;
+    }
 
-//    for (int i = 0; i < 4; i++)
-//    {
-//        for (int j = 0; j < 4; j++)
-//        {
-//            cout << board->best_successor[i * 4 + j] << " ";
-//        }
-//        cout << endl;
-//    }
-//    cout << board->number_conflicts_best_successor << endl;
-    
 	return 0;
 }

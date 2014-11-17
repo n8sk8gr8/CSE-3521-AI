@@ -87,6 +87,7 @@ public:
     std::string file_name;
     std::vector<Board*> pop;
     std::vector<int> crossover_population;
+    static std::vector<int> solution_board;
     Population(std::string);
 
     ~Population(){};
@@ -99,6 +100,7 @@ public:
     void mutation();
     void setupNewPopulationToOldPopulation();
     bool checkSolved();
+    static void setSolutionBoard(Board*);
 };
 
 
