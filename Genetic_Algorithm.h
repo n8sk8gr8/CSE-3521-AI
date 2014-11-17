@@ -71,13 +71,11 @@ public:
     void printSudokuBoard();
     void printBoard(std::vector<int> &current_board);
     void printSuccessorBox(std::vector<int> box);
-    void generateSuccessor();
     void evaluate();
     void checkHorizontalConflicts();
     void checkVerticalConflicts();
     void checkBoxConflicts();
     int duplicates(std::vector<int> box);
-    void setBestSuccessor();
     void hillClimber();
 };
 
@@ -95,6 +93,8 @@ public:
     void setupPopulation();
     void geneticAlgorithm();
     void crossoverProbability();
+    void selectCrossoverIndividuals();
+    void crossover();
 };
 
 

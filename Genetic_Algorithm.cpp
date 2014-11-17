@@ -8,7 +8,7 @@
 #include <fstream>
 #include <time.h>
 #include <unistd.h> // sleep
-#include <cstdlib> // for srand
+#include <cstdlib> // rand
 #include "Genetic_Algorithm.h"
 #include <math.h> // round
 
@@ -18,7 +18,7 @@ double Board::population_fitness = 0.0;
 
 Population::Population(std::string filename)
 {
-    pop.resize(20);
+    pop.resize(100);
     cout << pop.size() << endl;
     file_name = filename;
 }
@@ -96,20 +96,6 @@ void Board::printSuccessorBox(vector<int> box)
     }
 }
 
-/* Generate all possible successors */
-void Board::generateSuccessor()
-{
-//    for (int i = 0; i < state_vector.size(); i++)
-//    {
-//        for (int j = 0; j < 4; j++)
-//        {
-//            int value = successor[state_vector[i]];
-//            successor[state_vector[i]] = j + 1;
-//            this->evaluate();
-//            successor[state_vector[i]] = value;
-//        }
-//    }
-}
 
 /* Counts all of the horizontal conflicts in the current successor board */
 void Board::checkHorizontalConflicts()
@@ -183,67 +169,115 @@ void Board::checkBoxConflicts()
 void Board::hillClimber()
 {
     int number_conflicts_best_previous_successor = 145;
-    //while (number_conflicts_best_successor != number_conflicts_best_previous_successor && !solved)
-    //{
-        //number_conflicts_best_previous_successor = number_conflicts_best_successor;
-        
-        /* Find next successor */
-        //generateSuccessor();
     evaluate();
-        //cout << "number_conflicts_best_successor = " << number_conflicts_best_successor << endl;
-        
-        //cout << "number_conflicts_best_previous_successor = " << number_conflicts_best_previous_successor << endl;
 
-        /* Check if the Sudoku puzzle is solved */
-        if (number_conflicts_best_successor == 0)
-        {
-            cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
-            solved = true;
-        }
-        
-//        /* Set Best successor found to successor */
-//        for (int i = 0; i < best_successor.size(); i++)
-//        {
-//            successor[i] = (best_successor[i]);
-//        }
-    //}
+    /* Check if the Sudoku puzzle is solved */
+    if (fitness_value == 144)
+    {
+        cout << "SUDOKU PUZZLE SOLVED!!!!!!!" << endl;
+        solved = true;
+    }
 }
 void Population::crossoverProbability()
 {
     for (int i = 0; i < pop.size(); i++)
     {
         pop[i]->crossover_prob = pop[i]->fitness_value / Board::population_fitness;
-        cout << "Individual " << i << "  " << pop[i]->crossover_prob * 100.0 << endl;
         
-        for (int j = 0; j < round(pop[i]->crossover_prob * 100.0); j++)
+        cout << "Individual " << i << "  " << pop[i]->crossover_prob * 1000.0 << endl;
+        
+        for (int j = 0; j < round(pop[i]->crossover_prob * 1000.0); j++)
         {
             crossover_population.push_back(i);
         }
     }
 }
+
+
+void Population::selectCrossoverIndividuals()
+{
+    for (int i = 0; i < pop.size(); i++)
+    {
+        int individual = rand() % crossover_population.size();
+        pop[i] = pop[crossover_population[individual]];
+        
+        cout << "Individual " << i << " is  now " << crossover_population[individual] << endl;
+        pop[i]->printSudokuBoard();
+    }
+}
+
+
+void Population::crossover()
+{
+    for (int i = 0; i < pop.size() / 2; i++)
+    {
+        Board* individual1 = pop[i];
+        Board* individual2 = pop[i + 1];
+        
+        int head_or_tails = rand() % 2;
+        int split = rand() % individual1->sudoko_board.size();
+        
+        /* Cross head of individual1 and tail of individual2 */
+        if (head_or_tails == 0)
+        {
+            for (int j = 0; j < split; j++)
+            {
+                pop[i]->successor[j] = individual1->sudoko_board[j];
+                pop[i + 1]->successor[j] = individual2->sudoko_board[j];
+            }
+            
+            for (int j = split; j < individual1->sudoko_board.size(); j++)
+            {
+                pop[i]->successor[j] = individual2->sudoko_board[j];
+                pop[i + 1]->successor[j] = individual1->sudoko_board[j];
+            }
+        }
+        /* Cross head of individual2 and tail of individual1 */
+        else
+        {
+            for (int j = 0; j < split; j++)
+            {
+                pop[i]->successor[j] = individual2->sudoko_board[j];
+                pop[i + 1]->successor[j] = individual1->sudoko_board[j];
+            }
+            
+            for (int j = split; j < individual1->sudoko_board.size(); j++)
+            {
+                pop[i]->successor[j] = individual1->sudoko_board[j];
+                pop[i + 1]->successor[j] = individual2->sudoko_board[j];
+            }
+        }
+    }
+}
+
+
 void Population::geneticAlgorithm()
 {
-    //int i = 0;
     for (int i = 0; i < pop.size(); i++)
     {
         
         //number_conflicts_best_successor = 144;
         pop[i]->initalizeSudokuBoard();
         pop[i]->setupInitialPopulation();
-        pop[i]->printSudokuBoard();
-        pop[i]->hillClimber();
-        cout << "TIMEOUT COUNT " << i << endl;
-        //i++;
+        cout << "Initalized individual " << i << endl;
     }
-    cout << "Population fitness " << Board::population_fitness << endl;
-    crossoverProbability();
     
-    cout << "CROSS OVER POPULATION" << endl;
-    for (int i = 0 ; i < crossover_population.size(); i++)
+    for (int i = 0; i < 1000; i++)
     {
-        cout << crossover_population[i] << endl;
-    }
 
+        cout << "POP SIZE " << pop.size() << endl;
+        for (int j = 0; j < pop.size(); j++)
+        {
+            pop[j]->printSudokuBoard();
+            pop[j]->hillClimber();
+        }
+        crossoverProbability();
+        cout << "Population fitness " << Board::population_fitness << endl;
+        selectCrossoverIndividuals();
+        cout << "\nCrossover occurs " << endl;
+        crossover();
+        Board::population_fitness = 0.0;
+    }
 }
 
 void Board::evaluate()
@@ -262,25 +296,6 @@ void Board::evaluate()
     population_fitness += fitness_value;
     cout << "Fitness Value = " << fitness_value << endl;
     
-//    if (number_conflicts < number_conflicts_best_successor)
-//    {
-//        cout << "Setting new Best successor " << endl;
-//        this->setBestSuccessor();
-//    }
-    
     cout << endl;
-    //number_conflicts = 0;
-}
-
-
-void Board::setBestSuccessor()
-{
-    best_successor.clear();
-    number_conflicts_best_successor = number_conflicts;
-    cout << successor.size() << endl;
-    
-    for (int i = 0; i < successor.size(); i++)
-    {
-        best_successor.push_back(successor[i]);
-    }
+    number_conflicts = 0;
 }
